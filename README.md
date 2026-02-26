@@ -1,47 +1,39 @@
 # Losvie - "Live OS Virtual Install Environment"
 ## An OS provisiong environment for constrained Bare Metal deployments
----
 
 **WIP**
 
-losvie is a packaging of widgets that provide a novel OS installation environment suited for "constrained" environments like "Bare Metal Clouds" or "edge sites" where provisioning tooling or access may be limiting. 
+losvie is a collection of widgets that provide a novel OS installation environment suited for "constrained" environments like "Bare Metal Clouds" or "edge sites". 
 
-losvie can be described best through three chapters of a story:
+losvie can best be described through three chapters of a story:
 
-1. Take an Enterprise Linux LiveOS ISO, repackage the contents and host them exposed via HTTP as *losvie* artifacts
-2. Boot a computer into that *losvie* LiveOS, leaving its hardware (e.g boot disk) as available
-3. Use a [libvirt](https://libvirt.org/) VM as a sort of "outside-in" OOB, providing the CD-ROM, KVM and hardware passthrough to the installer
+1. Build: Take an Enterprise Linux LiveOS ISO, unpackage it and repackage it with the contents of this repo, and then host those as losvie artifacts via HTTP
+2. Boot: Boot a computer into the *losvie* LiveOS via those hosted artifacts, leaving its hardware (e.g boot disk) as available
+3. Install: Use a [libvirt](https://libvirt.org/) VM as a sort of "outside-in" OOB, providing the CD-ROM, KVM and hardware passthrough to the installer
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/dlotterman/losvie/refs/heads/main/assets/losvie.png" alt="losvie diagram" width="500">
   </a>
 </p>
 
-### Why do this? 
-**Surely in 2026 installing an Operating Systems over a network cannot be that hard?**
- 
-Installing an OS to a computer over the network in 2026 can be harder than ever.
+### Why?
 
 The following constraints routinely challenge Operators of "Bare Metal" infrastructure:
 
 1. Limited physical access to the hardware
-  - No USB or CD-ROM access
-2. Variety of hardware or hardware where drivers are a challenge
+2. Wide variety of hardware or hardware where drivers are a challenge
 3. No access to untagged broadcast domains across servers
-  - Many "Cloud" networks are "Layer-3" centric, breaking traditional "DHCP -> PXE" stacks
 4. No or limited OOB access
-  - Maybe "serial console" or "keyboard" only access when installer is GUI driven
-5. Difficult to automate
-8. Licensing
+5. Difficult widgets to automate
+8. Licensing and Support agreements
 
-These constraints often reflect the requirements of their environment. Bare Metal Clouds may restrict access to BMC's for security and hide broadcast domains for scaleability, while Edge sites may suffer from "A ticket and 7 day waits for someone to move the IP-KVM" problems.
+These constraints often reflect the requirements of their environment. Bare Metal Clouds may restrict access to BMC's for security and hide broadcast domains for scaleability, while Edge sites may suffer from "A ticket and 7 day waits for someone to move the IP-KVM" type problems.
 
-Despite these challenges, situations will arise where Operators will want to install an OS to a piece of hardware over a network where a number of challenges make that difficult, losvie can be a critical pinch-hitting tool.
+Despite these challenges, situations will arise where Operators will want to install an OS to a piece of hardware over a network where these or other challenges make that difficult, losvie can be a critical pinch-hitting tool in these scenarios.
 
-losvie started as an "exploration of a bad idea for fun" and as an idea has become a perpetually useful tool in the toolbelt for a small number of Operators. Credit to [enkelprifti98/metal-isometric-xepa](https://github.com/enkelprifti98/metal-isometric-xepa) as most adjacent inspiration.
+losvie started as an "exploration of a bad idea for fun", and as an idea has become a perpetually useful tool in the toolbelt for a small number of Operators. Credit to [enkelprifti98/metal-isometric-xepa](https://github.com/enkelprifti98/metal-isometric-xepa) as most adjacent inspiration.
 
-## losvie in an Operator's story
----
+## losvie as an Operators story
 
 ### Build losvie
 
@@ -77,6 +69,9 @@ ufw route allow in on enp1s0 out on podman0 to any port 5000
   - `losvie-pubkeys.service` downloads an `authorized_keys` file and prepares the system
   - `losvie-firewall.service` punches holes in the firewall and starts `sshd.service`
   - `losvie-restart-network.service` covers edges cases in passing through "all NICss" to the the VM when needing network access.
+
+
+### Install the Bare Metal Operating System via install environment VM
 
 6. The Operator uploads / downloads their install artifacts to the "Bare Metal Server"
 
