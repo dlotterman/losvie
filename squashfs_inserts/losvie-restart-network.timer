@@ -1,0 +1,9 @@
+[Unit]
+Description=losvie-restart-network-timer
+[Timer]
+OnUnitInactiveSec=29sec
+OnBootSec=5m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,12 @@
+[Unit]
+Description="losvie-firewall"
+Wants=network-online.target losvie-pubkeys.service
+After=network-online.target losvie-pubkeys.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/losvie-firewall.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

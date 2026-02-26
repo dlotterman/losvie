@@ -1,2 +1,134 @@
-# losvie
-Live OS Virtual Install Environment
+# Losvie - "Live OS Virtual Install Environment"
+## An OS provisiong environment for constrained Bare Metal deployments
+---
+
+**WIP**
+
+losvie is a packaging of widgets that provide a novel OS installation environment suited for "constrained" environments like "Bare Metal Clouds" or "edge sites" where provisioning tooling or access may be limiting. 
+
+losvie can be described best through three chapters of a story:
+
+1. Take an Enterprise Linux LiveOS ISO, repackage the contents and host them exposed via HTTP as *losvie* artifacts
+2. Boot a computer into that *losvie* LiveOS, leaving its hardware (e.g boot disk) as available
+3. Use a [libvirt](https://libvirt.org/) VM as a sort of "outside-in" OOB, providing the CD-ROM, KVM and hardware passthrough to the installer
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/dlotterman/losvie/refs/heads/main/assets/losvie.png" alt="losvie diagram" width="500">
+  </a>
+</p>
+
+### Why do this? 
+**Surely in 2026 installing an Operating Systems over a network cannot be that hard?**
+ 
+Installing an OS to a computer over the network in 2026 can be harder than ever.
+
+The following constraints routinely challenge Operators of "Bare Metal" infrastructure:
+
+1. Limited physical access to the hardware
+  - No USB or CD-ROM access
+2. Variety of hardware or hardware where drivers are a challenge
+3. No access to untagged broadcast domains across servers
+  - Many "Cloud" networks are "Layer-3" centric, breaking traditional "DHCP -> PXE" stacks
+4. No or limited OOB access
+  - Maybe "serial console" or "keyboard" only access when installer is GUI driven
+5. Difficult to automate
+8. Licensing
+
+These constraints often reflect the requirements of their environment. Bare Metal Clouds may restrict access to BMC's for security and hide broadcast domains for scaleability, while Edge sites may suffer from "A ticket and 7 day waits for someone to move the IP-KVM" problems.
+
+Despite these challenges, situations will arise where Operators will want to install an OS to a piece of hardware over a network where a number of challenges make that difficult, losvie can be a critical pinch-hitting tool.
+
+losvie started as an "exploration of a bad idea for fun" and as an idea has become a perpetually useful tool in the toolbelt for a small number of Operators. Credit to [enkelprifti98/metal-isometric-xepa](https://github.com/enkelprifti98/metal-isometric-xepa) as most adjacent inspiration.
+
+## losvie in an Operator's story
+---
+
+### Build losvie
+
+1. In a [cloud_dev_env](http://todo), Operator downloads a [Rocky](https://rockylinux.org/download/)/[Alma](https://almalinux.org/download/)/[Fedora](https://getfedora.org/en/workstation/download/) LiveOS ISO of choice
+
+2. In same [cloud_dev_env](http://todo), Operator clones and installs losvie
+  - `sudo` required because `install.sh` uses `unsquashfs` which writes `xattrs` (for SELinux). This is easiest with privilidges. 
+```
+git clont https://
+cd losvie
+sudo ./install.sh -d /opt/losvie -i /mnt/disk102_enc/share/installers/AlmaLinux-10-latest-x86_64-Live-GNOME.iso
+```
+
+5. Operator edits `losvie.ipxe` file
+
+6. Operator writes `authorized_keys` file in losvie directory (`/opt/losvie/export` by default)
+
+4. Operator uploads `export/` artifacts to CDN or exposes folder with HTTP from workstation
+```
+podman run -d --rm --name http-server -p 5000:5000 -v /opt/losvie/export:/html:ro,z ghcr.io/patrickdappollonio/docker-http-server:v2
+firewall-cmd --add-port=5000 --zone=public
+firewall-cmd --add-port=5000 --zone=public --permanent
+```
+or alternate`ufw` commands:
+```
+ufw allow 5000
+ufw route allow in on enp1s0 out on podman0 to any port 5000
+```
+
+### Boot server into LiveOS
+
+5. Operator boots a "Bare Metal Server" into the losvie environment which is a LiveOS running out of memory (not touching the boot disk)
+  - `losvie-pubkeys.service` downloads an `authorized_keys` file and prepares the system
+  - `losvie-firewall.service` punches holes in the firewall and starts `sshd.service`
+  - `losvie-restart-network.service` covers edges cases in passing through "all NICss" to the the VM when needing network access.
+
+6. The Operator uploads / downloads their install artifacts to the "Bare Metal Server"
+
+7. Operator identifies the hardware device(s) they would like to passthrough:
+```
+root@localhost-live:~# virsh nodedev-list --tree | grep -B2 enp1s0f0
+  |   +- pci_0000_01_00_0
+  |   |   |
+  |   |   +- net_enp1s0f0_90_5a_08_31_13_18
+```
+
+4. Determine chassis BIOS / UEFI state (directory existance instance EFI):
+```
+# file /sys/firmware/efi/
+/sys/firmware/efi/: directory
+```
+
+5. Identify OS boot disk:
+```
+lsblk 
+NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0     7:0    0   1.7G  1 loop /run/rootfsbase
+sda       8:0    0 447.1G  0 disk 
+sdb       8:16   0 447.1G  0 disk 
+nvme1n1 259:0    0   1.7T  0 disk /mnt
+nvme0n1 259:1    0   1.7T  0 disk 
+```
+
+5. Operator begins OS installation:
+```
+virt-install \
+    --graphics vnc,password=foobar,listen=0.0.0.0 \
+    --memory 8192 \
+    --vcpus 4 \
+    --name W2k5 \
+    --sound none \
+    --os-variant win2k25 \
+    --virt-type kvm \
+    --autoconsole none \
+    --network network=default,model=e1000 \
+		--host-device=pci_0000_81_00_0 \
+	  --disk /dev/sda \
+	  --cdrom /mnt/26100.1742.240906-0331.ge_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso \
+    --machine q35 \
+    --boot uefi
+ ```
+ 
+ 6. When OS installation is complete, installer will likely poweroff the install VM, Operator has two choices:
+   - Is OS is ready to take over the Bare Metal host? If reboot the host from LiveOS state and it will reboot into the local disk
+   - If further OS configuration is required (enabling services, modifying network configuration), start the VM again and make needed changes before poweroff of VM and rebooting the LiveOS host, which again should reboot into the host bootdisk.
+
+
+
+# Troubleshooting
+Please see [docs/troubleshooting.md](docs/troubleshooting.md)

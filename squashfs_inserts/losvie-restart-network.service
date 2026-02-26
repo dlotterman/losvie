@@ -1,0 +1,11 @@
+[Unit]
+Description="losvie-restart-network"
+Wants=network-online.target losvie-firewall.service
+After=network-online.target losvie-firewall.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/losvie-restart-network.sh
+
+[Install]
+WantedBy=multi-user.target
