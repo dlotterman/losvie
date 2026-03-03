@@ -49,8 +49,8 @@ sudo xorriso -as mkisofs \
   -publisher "MICROSOFT CORPORATION" \
   -p "MICROSOFT CORPORATION, ONE MICROSOFT WAY, REDMOND WA 98052, (425) 882-8080"     -A "CDIMAGE 2.56 (01/01/2005 TM)" \
   -isohybrid-gpt-basdat \
-  -o /tmp/tmp/win_custom.iso \
-  /tmp/export_win
+  -o /tmp/tmp/4win.iso \
+  /tmp/2export_win
 ```
 BIOS?
 

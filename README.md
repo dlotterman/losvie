@@ -1,9 +1,9 @@
 # Losvie - "Live OS Virtual Install Environment"
-## An OS provisioning toolkit for constrained Bare Metal deployments
+## An OS provisioning toolkit for operationally constrained Bare Metal
 
 **WIP**
 
-losvie is a collection of widgets that provide a novel OS installation environment suited for "constrained" deploments like "Bare Metal Clouds" or "Edge Sites". 
+losvie is a collection of widgets that provide a novel OS installation platform suited for "constrained" environments like "Bare Metal Clouds" or "Edge Sites". 
 
 losvie is three chapters of a story:
 
@@ -12,6 +12,7 @@ losvie is three chapters of a story:
 2. **Boot**: Boot a "Bare Metal Server" into losvie via the hosted artifacts
   - Leaving its hardware (e.g boot disk) as available
 3. **Install**: Use a [libvirt](https://libvirt.org/) VM as a sort of "outside-in" OOB, providing the CD-ROM, KVM and hardware passthrough to the installer
+  - Host reboots into boot disk and the OS that was installed via the VM
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/dlotterman/losvie/refs/heads/main/assets/losvie.png" alt="losvie diagram" width="750">

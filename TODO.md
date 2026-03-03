@@ -1,2 +1,26 @@
 - Cloud Dev Env Documentation
 - Container the build phase
+- Container the install phase
+- Include iPXE build from source in build phase
+  - pxe artifacts
+  - efi artifacts
+  - ISO artifacts
+  - USB-ready artifacts
+  - UEFI vs BIOS handling
+- Documentation
+  - Install
+    - Video vs Serial vs OOB vs SoL
+    - Install Vectors
+      - NIC firmware
+        - PXE
+          - iPXE
+        - iPXE
+          - SeaBIOS
+      - UEFI BIOS
+        - EFI http
+      - ISO
+      - USB
+      - Netboot
+      - LiveOS / RescueOS
+      - OOB (iDRAC / iLO, "IPMI")
+  -
