@@ -58,6 +58,7 @@ mkdir -p $INSTALL_DIR/unpack_squashfs
 mkdir -p $INSTALL_DIR/export
 rm -rf $INSTALL_DIR/export/*
 
+echo mount -o loop,ro $ISO $INSTALL_DIR/mount
 mount -o loop,ro $ISO $INSTALL_DIR/mount
 
 logger -s "copying data from ISO mount to unpack dir, may take some time"
@@ -92,7 +93,7 @@ mksquashfs $INSTALL_DIR/unpack_squashfs/ $INSTALL_DIR/export/losvie.squashfs
 cp $INSTALL_DIR/unpack_iso/images/pxeboot/initrd.img $INSTALL_DIR/export/
 cp $INSTALL_DIR/unpack_iso/images/pxeboot/vmlinuz $INSTALL_DIR/export/
 
-#cp $ABS_PATH/glue/losvie.ipxe
+cp $ABS_PATH/glue/losvie.ipxe
 
 # You can comment this out, but I've foudn squashfs doing weird stuff with overlap so I like to just clear it umount
 rm -rf $INSTALL_DIR/mount
