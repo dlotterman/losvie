@@ -55,7 +55,7 @@ sudo xorriso -as mkisofs \
 BIOS?
 
 ```
-xorriso -as mkisofs -o /tmp/win_bios.iso -iso-level 3 -J -R -no-emul-boot -b boot/etfsboot.com -boot-load-size 8 -joliet -relaxed-filenames /tmp/export_win/
+genisoimage   -o /tmp/tmp/3windows.iso   -b boot/etfsboot.com   -no-emul-boot   -boot-load-seg 0x07C0   -boot-load-size 8   -iso-level 2   -udf   -joliet   -joliet-long   -full-iso9660-filenames   -relaxed-filenames   -D   -N   -V "WINDOWS_INSTALL" -allow-limited-size   /tmp/export_win
   ```
 
 ## Docs Links

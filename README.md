@@ -1,5 +1,5 @@
 # Losvie - "Live OS Virtual Install Environment"
-## An OS provisiong toolkit for constrained Bare Metal deployments
+## An OS provisioning toolkit for constrained Bare Metal deployments
 
 **WIP**
 
@@ -7,14 +7,14 @@ losvie is a collection of widgets that provide a novel OS installation environme
 
 losvie is three chapters of a story:
 
-1. Build: Take an Enterprise Linux LiveOS ISO, unpackage it and repackage it with the contents of this repo
-  - Host those as losvie artifacts via HTTP
-2. Boot: Boot a "Bare Metal Server" into losvie via the hosted artifacts
+1. **Build**: Repackge an Enterprise Linux ISO with the contents of [squashfs_inserts](squashfs_inserts/)
+  - Host those artifacts via HTTP
+2. **Boot**: Boot a "Bare Metal Server" into losvie via the hosted artifacts
   - Leaving its hardware (e.g boot disk) as available
-3. Install: Use a [libvirt](https://libvirt.org/) VM as a sort of "outside-in" OOB, providing the CD-ROM, KVM and hardware passthrough to the installer
+3. **Install**: Use a [libvirt](https://libvirt.org/) VM as a sort of "outside-in" OOB, providing the CD-ROM, KVM and hardware passthrough to the installer
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/dlotterman/losvie/refs/heads/main/assets/losvie.png" alt="losvie diagram" width="500">
+    <img src="https://raw.githubusercontent.com/dlotterman/losvie/refs/heads/main/assets/losvie.png" alt="losvie diagram" width="750">
   </a>
 </p>
 
@@ -29,7 +29,7 @@ The following constraints routinely challenge Operators of "Bare Metal" compute 
 8. Licensing and Support agreements
 5. Difficult or blocked paths to automation
 
-These constraints often reflect the requirements of their circumstance. Bare Metal Clouds may restrict access to OOB's for security and isolate broadcast domains for scaleability, while "Edge Sites" may suffer from "A ticket and 7 day waits for someone to move the IP-KVM" type problems.
+These constraints often reflect the requirements of their circumstance; Bare Metal Clouds may restrict access to OOB's for security and isolate broadcast domains for scaleability, while "Edge Sites" may suffer from "A ticket and 7 day waits for someone to move the IP-KVM" type problems.
 
 Despite these challenges, Operators will want to install an OS to a piece of hardware over a network where these or other challenges make that difficult, losvie is meant for these scenarios.
 

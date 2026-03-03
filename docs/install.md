@@ -10,7 +10,7 @@ root@localhost-live:~# virsh nodedev-list --tree | grep -B2 enp1s0f0
   |   |   +- net_enp1s0f0_90_5a_08_31_13_18
 ```
 
-4. Determine chassis BIOS / UEFI state (directory existance instance EFI):
+4. Determine chassis BIOS / UEFI state (directory existence instance EFI):
 ```
 # file /sys/firmware/efi/
 /sys/firmware/efi/: directory
