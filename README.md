@@ -3,11 +3,12 @@
 
 **WIP**
 
-losvie is a collection of widgets that provide a novel OS installation environment suited for "constrained" environments like "Bare Metal Clouds" or "edge sites". 
+losvie is a collection of widgets that provide a novel OS installation environment suited for "constrained" deploments like "Bare Metal Clouds" or "Edge Sites". 
 
-losvie can best be described through three chapters of a story:
+losvie is three chapters of a story:
 
-1. Build: Take an Enterprise Linux LiveOS ISO, unpackage it and repackage it with the contents of this repo, and then host those as losvie artifacts via HTTP
+1. Build: Take an Enterprise Linux LiveOS ISO, unpackage it and repackage it with the contents of this repo
+  - Then host those as losvie artifacts via HTTP
 2. Boot: Boot a computer into the *losvie* LiveOS via those hosted artifacts, leaving its hardware (e.g boot disk) as available
 3. Install: Use a [libvirt](https://libvirt.org/) VM as a sort of "outside-in" OOB, providing the CD-ROM, KVM and hardware passthrough to the installer
 
@@ -18,7 +19,7 @@ losvie can best be described through three chapters of a story:
 
 ### Why?
 
-The following constraints routinely challenge Operators of "Bare Metal" infrastructure:
+The following constraints routinely challenge Operators of "Bare Metal" compute:
 
 1. Limited physical access to the hardware
 2. Wide variety of hardware or hardware where drivers are a challenge
@@ -27,43 +28,24 @@ The following constraints routinely challenge Operators of "Bare Metal" infrastr
 5. Difficult widgets to automate
 8. Licensing and Support agreements
 
-These constraints often reflect the requirements of their environment. Bare Metal Clouds may restrict access to BMC's for security and hide broadcast domains for scaleability, while Edge sites may suffer from "A ticket and 7 day waits for someone to move the IP-KVM" type problems.
+These constraints often reflect the requirements of their circumstance. Bare Metal Clouds may restrict access to OOB's for security and isolate broadcast domains for scaleability, while "Edge Sites" may suffer from "A ticket and 7 day waits for someone to move the IP-KVM" type problems.
 
-Despite these challenges, situations will arise where Operators will want to install an OS to a piece of hardware over a network where these or other challenges make that difficult, losvie can be a critical pinch-hitting tool in these scenarios.
+Despite these challenges,Operators will want to install an OS to a piece of hardware over a network where these or other challenges make that difficult, and losvie can be a critical pinch-hitting tool in these scenarios.
 
 losvie started as an "exploration of a bad idea for fun", and as an idea has become a perpetually useful tool in the toolbelt for a small number of Operators. Credit to [enkelprifti98/metal-isometric-xepa](https://github.com/enkelprifti98/metal-isometric-xepa) as most adjacent inspiration.
 
-## losvie as an Operators story
+# Documentations
+- [Getting Started]()
+- [Build]()
+- [Boot]()
+- [Install]()
+## losvie as an Operators story:
 
-### Build losvie
+### Build
 
-1. In a [cloud_dev_env](http://todo), Operator downloads a [Rocky](https://rockylinux.org/download/)/[Alma](https://almalinux.org/download/)/[Fedora](https://getfedora.org/en/workstation/download/) LiveOS ISO of choice
 
-2. In same [cloud_dev_env](http://todo), Operator clones and installs losvie
-  - `sudo` required because `install.sh` uses `unsquashfs` which writes `xattrs` (for SELinux). This is easiest with privilidges. 
-```
-git clont https://
-cd losvie
-sudo ./install.sh -d /opt/losvie -i /mnt/disk102_enc/share/installers/AlmaLinux-10-latest-x86_64-Live-GNOME.iso
-```
 
-5. Operator edits `losvie.ipxe` file
-
-6. Operator writes `authorized_keys` file in losvie directory (`/opt/losvie/export` by default)
-
-4. Operator uploads `export/` artifacts to CDN or exposes folder with HTTP from workstation
-```
-podman run -d --rm --name http-server -p 5000:5000 -v /opt/losvie/export:/html:ro,z ghcr.io/patrickdappollonio/docker-http-server:v2
-firewall-cmd --add-port=5000 --zone=public
-firewall-cmd --add-port=5000 --zone=public --permanent
-```
-or alternate`ufw` commands:
-```
-ufw allow 5000
-ufw route allow in on enp1s0 out on podman0 to any port 5000
-```
-
-### Boot server into LiveOS
+### Boot
 
 5. Operator boots a "Bare Metal Server" into the losvie environment which is a LiveOS running out of memory (not touching the boot disk)
   - `losvie-pubkeys.service` downloads an `authorized_keys` file and prepares the system
