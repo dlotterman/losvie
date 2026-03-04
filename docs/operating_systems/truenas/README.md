@@ -23,6 +23,3 @@ virt-install \
     --machine q35 \
     --boot uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no
 ```
-
-## 
-ISO does not appear to be UEFI aware?

@@ -4,7 +4,7 @@ dhcp
 set base $CLOUD_DEV_ENV
 set distrobase ${base}/export
 
-kernel ${distrobase}/vmlinuz ip=dhcp root=live:${distrobase}/losvie.squashfs sshpk=${base}/pk fw=192.168.50.0/24 fw=47.252.252.252 fw=104.252.252.252 initrd=initrd.img rd.net.timeout.iflink=92 rd.net.timeout.ifup=92 rd.net.timeout.carrier=92 console=tty0 console=ttyS0 ro rd.live.image rd.lvm=0 rd.luks=0 rd.md=0 rd.dm=0 rd.multipath=0 consoleblank=0 rd.timeout=110 module_blacklist=usbnet carrier_timeout=92 netpoll.carrier_timeout=92 rd.auto=0
+kernel ${distrobase}/vmlinuz ip=dhcp root=live:${distrobase}/losvie.squashfs sshpk=${base}/pk fw=104.252.252.252 initrd=initrd.img rd.net.timeout.iflink=92 rd.net.timeout.ifup=92 rd.net.timeout.carrier=92 console=tty0 console=ttyS0 ro rd.live.image rd.lvm=0 rd.luks=0 rd.md=0 rd.dm=0 rd.multipath=0 consoleblank=0 rd.timeout=110 module_blacklist=usbnet netpoll.carrier_timeout=92 rd.auto=0
 
 initrd ${distrobase}/initrd.img
 
