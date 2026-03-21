@@ -77,7 +77,7 @@ ufw route allow in on enp1s0 out on podman0 to any port 5000
 - `rd.live.image`
   - Too long to document, instructs kernel to mount correctly for a squashfs based LiveOS
 - `ro`
-  - *orce mounting / and /usr (if it is a separate device) read-only.*
+  - *Force mounting / and /usr (if it is a separate device) read-only.*
 
 [losvie cmdline paramets](https://github.com/dlotterman/losvie/tree/main/squashfs_inserts)
 - `fw=47.252.252.252`
