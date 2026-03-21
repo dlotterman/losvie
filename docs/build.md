@@ -1,28 +1,49 @@
 # Build
 
+## Requirements
+
+1. A *"build host"* running a modern Linux distrobution with `squashfs-tools` tools installed, to be used as a build host. Likely options are:
+  1. Locally hosted VM or OS Container
+    - If build host is behind a firewall with no ability to expose a port to the internet, then a CDN will be required.
+  2. Cloud hosted VM
+    - If build host is a "Cloud" instance with a Public IP, then build artifacts can be hosted via that Cloud instanc
+
+You will likely want a VNC client on your physical workstation if you need to engage with an interactive OS for the intended installer. If you cannot run a VNC client because of say corporate restrictions, you can use [Cockpit](docs/cockpit.md) as a vector to a hosted interactive session with the VM.
+
 **WIP** 
 
-1. In a [cloud_dev_env](../TODO.md), Operator downloads a [Rocky](https://rockylinux.org/download/)/[Alma](https://almalinux.org/download/)/[Fedora](https://getfedora.org/en/workstation/download/) LiveOS ISO of choice
+1. On the *build host*, Operator downloads a [Rocky](https://rockylinux.org/download/)/[Alma](https://almalinux.org/download/)/[Fedora](https://getfedora.org/en/workstation/download/) LiveOS ISO of choice
 
-2. In same [cloud_dev_env](http://todo), Operator clones and installs losvie
+2. On the same *build host*, Operator clones and installs [losvie](https://github.com/dlotterman/losvie)
   - `sudo` required because `install.sh` uses `unsquashfs` which writes `xattrs` (for SELinux). This is easiest with privilidges. 
 ```
-git clont https://
+git clone https://github.com/dlotterman/losvie.git
 cd losvie
-sudo ./install.sh -d /opt/losvie -i /mnt/disk102_enc/share/installers/AlmaLinux-10-latest-x86_64-Live-GNOME.iso
+sudo ./install.sh -u dlotterman -e "http://dl-w-p.b-cdn.net/losvie2" -f "192.168.50.0/24" -d /opt/losvie -i /mnt/disk102_enc/share/installers/AlmaLinux-10-latest-x86_64-Live-GNOME.iso
 ```
+* `-u dlotterman` tells the install script to chown the files back to this after likely creating as root (via sudo), user convenience
+* `-e "http://dl-w-p.b-cdn.net/losvie2"` tells the installs script the expected public HTTP endpoint so that it can template the `ipxe` file as a convenience
+* `-f "192.168.50.0/24"` tells the install script to template the firewall-hole punch into the `ipxe` file as a covenience
+* `-d /opt/losvie` tells the install script to create and use the target directory as the build location for losvie artifacts
+* `-i /mnt/disk102_enc/share/installers/AlmaLinux-10-latest-x86_64-Live-GNOME.iso` tells the install script where to find the LiveOS ISO locally on the *build host* so it can unpack mangle and repack.
 
 5. Operator edits `losvie.ipxe` file
 
 6. Operator writes `authorized_keys` file in losvie directory (`/opt/losvie/export` by default)
 
-4. Operator uploads `export/` artifacts to CDN or exposes folder with HTTP from workstation
+4. Operator uploads `export/` artifacts to CDN **OR** exposes folder with HTTP from workstation
+
+Example of easy exposure via `podman` (replace with `docker` if needed)
 ```
 podman run -d --rm --name http-server -p 5000:5000 -v /opt/losvie/export:/html:ro,z ghcr.io/patrickdappollonio/docker-http-server:v2
+```
+
+`firewalld`:
+```
 firewall-cmd --add-port=5000 --zone=public
 firewall-cmd --add-port=5000 --zone=public --permanent
 ```
-or alternate`ufw` commands:
+`ufw`:
 ```
 ufw allow 5000
 ufw route allow in on enp1s0 out on podman0 to any port 5000
@@ -65,6 +86,7 @@ ufw route allow in on enp1s0 out on podman0 to any port 5000
 - `rd.md=0`
   - *disable MD RAID detection*
     - We do not want to pick up MDRAID trash
+    - Not working for some reason, still seeing RAID stuff I don't want
 - `rd.dm=0`
   - *disable MD RAID detection*
     - We do not want to pick up MDRAID trash pt2

@@ -4,7 +4,7 @@ SCRIPT_NAME=$(basename "$0")
 ABS_PATH=$(dirname -- "$( readlink -f -- "$0"; )"; )
 PNAME=$(echo $ABS_PATH | awk -F '/' '{print $(NF-1)}')
 SNAME=$(echo $ABS_PATH | awk -F '/' '{print $(NF)}')
-if [ ! -f "$ABS_PATH"/.env ]; then
+if [ -f "$ABS_PATH"/.env ]; then
     source "$ABS_PATH"/.env
 fi
 #"""
@@ -15,6 +15,9 @@ logger -s "PNAME="$PNAME""
 logger -s "SNAME="$SNAME""
 
 INSTALL_DIR="/opt/$SNAME/"
+USER=$(whoami)
+ENDPOINT="UPDATE_ME!"
+FW="UPDATE_ME!"
 
 # Get the options
 POSITIONAL_ARGS=()
@@ -31,6 +34,21 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
+    -u|--user)
+    USER="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -e|--endpoint)
+    ENDPOINT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -f|--firewallhole)
+    FW="$2"
+    shift # past argument
+    shift # past value
+    ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -46,7 +64,10 @@ set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 logger -s "install directory = ${INSTALL_DIR}"
 logger -s "iso = ${ISO}"
-
+logger -s "endpoint = ${ENDPOINT}"
+logger -s "firewallhole = ${FW}"
+export ENDPOINT=$ENDPOINT
+export FW=$FW
 if [[ -n $1 ]]; then
     echo "Last line of file specified as non-opt/last argument:"
     tail -1 "$1"
@@ -93,9 +114,12 @@ mksquashfs $INSTALL_DIR/unpack_squashfs/ $INSTALL_DIR/export/losvie.squashfs
 cp $INSTALL_DIR/unpack_iso/images/pxeboot/initrd.img $INSTALL_DIR/export/
 cp $INSTALL_DIR/unpack_iso/images/pxeboot/vmlinuz $INSTALL_DIR/export/
 
-cp $ABS_PATH/glue/losvie.ipxe $INSTALL_DIR/export/
+cat $ABS_PATH/glue/losvie.ipxe.tmpl | envsubst | tee $INSTALL_DIR/export/losvie.ipxe
 
 # You can comment this out, but I've foudn squashfs doing weird stuff with overlap so I like to just clear it umount
 rm -rf $INSTALL_DIR/mount
 rm -rf $INSTALL_DIR/unpack_iso
 rm -rf $INSTALL_DIR/unpack_squashfs
+
+chown -R $USER:$USER $INSTALL_DIR/export
+logger -s "done, be sure to edit $INSTALL_DIR/export/losvie.ipxe and add public keys / authorized_keys"

@@ -8,6 +8,8 @@ firewall-cmd --add-port=5900/tcp --zone=external
 firewall-cmd --add-port=5900/tcp --zone=external --permanent
 firewall-cmd --add-port=5901/tcp --zone=external
 firewall-cmd --add-port=5901/tcp --zone=external --permanent
+firewall-cmd --add-service=cockpit --zone=external
+firewall-cmd --add-service=cockpit --zone=external --permanent
 
 for ENTRY in $(cat /proc/cmdline); do
     #echo $ENTRY
